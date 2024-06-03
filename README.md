@@ -1,6 +1,6 @@
 # Miao-Yunzai v3
 
-基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) [Miao-Yunzai v3](https://github.com/yoimiya-kokomi/Miao-Yunzai/)及 改造 
+基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) 喵版[Miao-Yunzai v3](https://github.com/yoimiya-kokomi/Miao-Yunzai/)及 改造 
 
 需要同时安装[miao-plugin](https://github.com/yoimiya-kokomi/miao-plugin.git) ，且后续的一些底层改造可能会改变数据结构，无法直接迁回原版Yunzai，请根据自己需求情况慎重安装
 
@@ -43,10 +43,10 @@
 
 ```
 # 使用 Github 
-git clone --depth=1 https://github.com/yoimiya-kokomi/Miao-Yunzai.git
+git clone --depth=1 https://github.com/SummerLotus520/Miao-Yunzai.git
 cd Miao-Yunzai 
 git clone --depth=1 https://github.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
-
+```
 2.安装[pnpm](https://pnpm.io/zh/installation) ，已安装的可以跳过
 
 ```
