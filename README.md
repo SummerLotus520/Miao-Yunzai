@@ -1,21 +1,20 @@
 # Miao-Yunzai v3
 
-基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) 改造
+基于乐神版[云崽v3.0](https://gitee.com/le-niao/Yunzai-Bot) [Miao-Yunzai v3](https://github.com/yoimiya-kokomi/Miao-Yunzai/)及 改造 
 
 需要同时安装[miao-plugin](https://github.com/yoimiya-kokomi/miao-plugin.git) ，且后续的一些底层改造可能会改变数据结构，无法直接迁回原版Yunzai，请根据自己需求情况慎重安装
 
-使用[icqq](https://github.com/icqqjs/icqq) 登录，防止oicq可能出现的低版本问题
+使用[@icqqjs/icqq](https://github.com/icqqjs/icqq) 登录，防止oicq可能出现的低版本问题
 
 ---
 与原版Yunzai-Bot的差异：
 
 **【注意】：** 由于是独立新的仓库，【只建议新部署/部署后迁移】，不建议原Bot直接换源强更
-
+* **一些新特性：** 修改支持新icqq:[@icqqjs/icqq](https://github.com/icqqjs/icqq
 * **一些新特性：** Miao-Yunzai会逐步重构，增加新特性与功能，可能会有功能与形态上的变化。如期望功能更加稳定可使用此仓库[Yunzai-V3](https://gitee.com/yoimiya-kokomi/Yunzai-Bot)
 * **移除了签到功能：** 与原Yunzai独立的仓库，去除了较为敏感的签到功能，以尝试恢复[Github](https://github.com/yoimiya-kokomi/Miao-Yunzai.git)
   环境。附加[Gitee](https://gitee.com/yoimiya-kokomi/Miao-Yunzai.git)
 * **默认启用喵版的功能：** 【#角色】【#深渊】【#帮助】等功能默认启用喵版，原版的逻辑会屏蔽，以便于后续逐步精简资源
-* **一键迁移 TRSS-Yunzai：** 若无法登录QQ，可尝试 `node trss` 迁移，迁移后可登录其他协议端 [TRSS-Yunzai](https://gitee.com/TimeRainStarSky/Yunzai)
 
 ## Miao-Yunzai后续计划
 
@@ -48,13 +47,6 @@ git clone --depth=1 https://github.com/yoimiya-kokomi/Miao-Yunzai.git
 cd Miao-Yunzai 
 git clone --depth=1 https://github.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
 
-
-# 使用Gitee
-git clone --depth=1 https://gitee.com/yoimiya-kokomi/Miao-Yunzai.git
-cd Miao-Yunzai 
-git clone --depth=1 https://gitee.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
-```
-
 2.安装[pnpm](https://pnpm.io/zh/installation) ，已安装的可以跳过
 
 ```
@@ -75,6 +67,7 @@ pnpm install -P
 pnpm config set registry https://registry.npmmirror.com
 pnpm install -P
 ```
+icqq请自行寻找门路安装 此处不便于提供
 
 4.运行（首次运行按提示输入登录）
 
@@ -131,3 +124,4 @@ sudo ln -s libstdc++.so.6.0.29 libstdc++.so.6
 |      [西风驿站](https://bbs.mihoyo.com/ys/collection/839181)      | 角色攻略图来源          |
 |     [米游社友人A](https://bbs.mihoyo.com/ys/collection/428421)     | 角色突破素材图来源        |
 | [icqq](https://github.com/icqqjs/icqq) | ICQQ             |
+| [Miao-Yunzai](https://github.com/yoimiya-kokomi/Miao-Yunzai/) | 原版喵崽             |
