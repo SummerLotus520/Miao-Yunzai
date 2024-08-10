@@ -12,11 +12,11 @@ export class exchange extends plugin {
       priority: 1000,
       rule: [
         {
-          reg: /^(#|\*)?(原神|星铁|崩铁|崩三|崩坏三|崩坏3)?(直播|前瞻)?兑换码$/,
+          reg: /^(#|\*)?(原神|星铁|崩铁|崩三|崩坏三|崩坏3|绝区零)?(直播|前瞻)?兑换码$/,
           fnc: 'getCode'
         },
         {
-          reg: '^#(兑换码使用|cdk-u).+',
+          reg: '^#(原神|星铁|绝区零)?(兑换码使用|cdk-u).+',
           fnc: 'useCode'
         }
       ]
@@ -24,13 +24,16 @@ export class exchange extends plugin {
   }
 
   async getCode() {
-    let reg = this.e.msg.match(/^(#|\*)?(原神|星铁|崩铁|崩三|崩坏三|崩坏3)?(直播|前瞻)?兑换码$/)
+    let reg = this.e.msg.match(/^(#|\*)?(原神|星铁|崩铁|崩三|崩坏三|崩坏3|绝区零)?(直播|前瞻)?兑换码$/)
     this.uid = '75276550'
     if (reg[1] == '*' || ['星铁', '崩铁'].includes(reg[2])) {
       this.uid = '80823548'
     }
     if (['崩三', '崩坏三', '崩坏3'].includes(reg[2])) {
       this.uid = '73565430'
+    }
+    if (reg[2] == '绝区零') {
+      this.uid = '152039148'
     }
     this.now = parseInt(Date.now() / 1000)
     let actid = await this.getActId()
@@ -129,6 +132,9 @@ export class exchange extends plugin {
       } else if (this.uid == '73565430') {
         date.setDate(date.getDate() + 5)
         this.deadline = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 12:00:00`
+      } else if (this.uid == '152039148') {
+        date.setDate(date.getDate() + 1)
+        this.deadline = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 23:59:59`
       } else {
         date.setDate(date.getDate() + 3)
         this.deadline = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} 12:00:00`
@@ -143,9 +149,9 @@ export class exchange extends plugin {
 
   // 兑换码使用
   async useCode() {
-    const cdkCode = this.e.msg.replace(/#(兑换码使用|cdk-u)/, '').trim()
+    const cdkCode = this.e.msg.replace(/#(原神|星铁|绝区零)?(兑换码使用|cdk-u)/, '').trim()
     const res = await MysInfo.get(this.e, 'useCdk', { cdk: cdkCode })
-    if (res) {
+    if (res.retcode == 0) {
       this.e.reply(`${res.data.msg}`)
     }
   }
