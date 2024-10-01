@@ -18,6 +18,7 @@ args:
   - --disable-setuid-sandbox
   - --no-sandbox
   - --no-zygote
+  - --window-position=-10000,-10000
 
 # puppeteer截图超时时间
 puppeteerTimeout:
