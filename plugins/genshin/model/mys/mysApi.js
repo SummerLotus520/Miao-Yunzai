@@ -152,7 +152,7 @@ export default class MysApi {
     }
 
     res.api = type
-
+    
     if (cached) this.cache(res, cacheKey)
 
     return res
