@@ -155,7 +155,7 @@ export default class MysInfo {
 
     if (!selfUser.hasCk) {
       if (e.noTips !== true) {
-        e.reply(['尚未绑定Cookie', segment.button([
+        e.reply(['请/#扫码登录/后使用', segment.button([
           { text: 'Cookie帮助', callback: '#Cookie帮助' }
         ])], false, { at: selfUser.qq })
       }
@@ -172,7 +172,7 @@ export default class MysInfo {
    * @param api
    * * `index` 米游社原神首页宝箱等数据
    * * `spiralAbyss` 原神深渊
-   * * `character` 原神角色详情
+   * * `character` 原神角色详情 
    * * `dailyNote` 原神树脂
    * * `bbs_sign` 米游社原神签到
    * * `detail` 详情
