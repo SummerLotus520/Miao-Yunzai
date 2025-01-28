@@ -168,7 +168,7 @@ export class user extends plugin {
     let set = gsCfg.getConfig('mys', 'set')
 
     if (!this.e.ck) {
-      await this.reply(`请发送/#扫码登录/后/#更新cookie/`))
+      await this.reply(`请发送/#扫码登录/后/#更新cookie/`)
       return
     }
 
