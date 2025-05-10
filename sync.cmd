@@ -21,13 +21,9 @@ if %errorlevel% equ 0 (
 ) else (
     echo 检测到本地修改，正在提交...
 
-    :: 使用固定的提交信息
-    set commit_msg=[手动同步]
+    :: 直接写入固定提交信息
+    git commit -m "[手动同步]"
 
-    :: 输出提交信息进行调试
-    echo 提交信息: %commit_msg%
-
-    git commit -m [手动同步]
     if %errorlevel% neq 0 (
         echo [错误] 提交失败
         pause
