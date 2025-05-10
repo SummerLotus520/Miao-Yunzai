@@ -1,7 +1,30 @@
-config/*.yaml
-data
-logs
-node_modules
-temp
-dump.rdb
+# Node dependencies
+node_modules/
+.pnpm-store/
+.pnp.*
+.pnpjs/
+
+# Yarn v4 Berry files
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Lockfiles
 pnpm-lock.yaml
+
+# Application-specific
+data/
+logs/
+temp/
+dump.rdb
+
+# Config files
+config/*.yaml
+
+# VSCode & Visual Studio
+.vscode/
+.vs/
+*.code-workspace
