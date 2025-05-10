@@ -44,7 +44,15 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: 7. 合并上游更新（允许不相关历史）
+:: 7. 检查是否有未同步的上游更新
+git log HEAD..trss/main --oneline >nul
+if %errorlevel% equ 0 (
+    echo 上游没有未同步更新
+) else (
+    echo 上游有未同步更新
+)
+
+:: 8. 合并上游更新（允许不相关历史）
 git merge trss/main --no-edit --allow-unrelated-histories
 if %errorlevel% neq 0 (
     echo [错误] 合并冲突！请手动解决后重新运行脚本
@@ -52,7 +60,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: 8. 推送到你的 fork（TRSS 分支）
+:: 9. 推送到你的 fork（TRSS 分支）
 git push origin TRSS
 if %errorlevel% neq 0 (
     echo [错误] 推送失败，检查网络或权限
