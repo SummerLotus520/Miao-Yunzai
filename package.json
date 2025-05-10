@@ -5,6 +5,7 @@
   "description": "Bot",
   "main": "app.js",
   "type": "module",
+  "private": true,
   "scripts": {
     "app": "node .",
     "dev": "node . dev",
