@@ -13,31 +13,30 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: 3. 检查本地是否有未提交的修改
-git add . 
-git diff-index --quiet HEAD
+:: 3. 暂存所有修改
+git add .
+
+:: 4. 检查是否有本地未提交的修改
+git status --porcelain | findstr "^M" >nul
 if %errorlevel% equ 0 (
-    echo 本地没有修改，跳过提交
-) else (
     echo 检测到本地修改，正在提交...
-
-    :: 直接写入固定提交信息
     git commit -m "[手动同步]"
-
     if %errorlevel% neq 0 (
         echo [错误] 提交失败
         pause
         exit /b 1
     )
+) else (
+    echo 本地没有修改，跳过提交
 )
 
-:: 4. 添加上游 TRSS 远程（如果不存在）
+:: 5. 添加上游 TRSS 远程（如果不存在）
 git remote get-url trss >nul 2>&1
 if %errorlevel% neq 0 (
     git remote add trss https://github.com/TimeRainStarSky/Yunzai.git
 )
 
-:: 5. 强制拉取最新代码（避免缓存问题）
+:: 6. 强制拉取最新代码（避免缓存问题）
 git fetch trss --force
 if %errorlevel% neq 0 (
     echo [错误] 拉取 TRSS 更新失败
@@ -45,7 +44,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: 6. 合并上游更新（允许不相关历史）
+:: 7. 合并上游更新（允许不相关历史）
 git merge trss/main --no-edit --allow-unrelated-histories
 if %errorlevel% neq 0 (
     echo [错误] 合并冲突！请手动解决后重新运行脚本
@@ -53,7 +52,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: 7. 推送到你的 fork（TRSS 分支）
+:: 8. 推送到你的 fork（TRSS 分支）
 git push origin TRSS
 if %errorlevel% neq 0 (
     echo [错误] 推送失败，检查网络或权限
