@@ -46,6 +46,6 @@ jobs:
           -d '{
                 "msgtype": "text",
                 "text": {
-                  "content": "【'"${REPO}"'】TRSS 同步任务完成。\n状态：'"${STATUS}"'\n最近输出：\n'"${OUTPUT}"'"
+                  "content": "BiliBili【'"${REPO}"'】TRSS 同步任务完成。\n状态：'"${STATUS}"'\n最近输出：\n'"${OUTPUT}"'"
                 }
               }'
