@@ -142,8 +142,13 @@ export class add extends plugin {
     if (!this.e.msg?.includes("#结束添加")) {
       /** 添加内容 */
       for (const i of this.e.message) {
-        if (i.url) i.file = await this.saveFile(i)
-        if (i.type == "at" && i.qq == this.e.self_id) continue
+        if (i.url) {
+          i.file = await this.saveFile(i)
+          delete i.url
+          delete i.fid
+        }
+        if (i.type == "at" && i.qq == this.e.self_id)
+          continue
         context.message.push(i)
       }
       return
@@ -276,6 +281,12 @@ export class add extends plugin {
     }
   }
 
+  delFile(msg) {
+    return Promise.allSettled(msg.map(i =>
+      i.file && fs.rm(`${this.path}${i.file}`)
+    ))
+  }
+
   async del() {
     this.isGlobal = this.e.msg.includes("全局")
     await this.getGroupId()
@@ -288,6 +299,9 @@ export class add extends plugin {
       return this.reply("删除错误：没有关键词")
 
     if (messageMap[this.group_id].has(this.keyWord)) {
+      await Promise.allSettled(
+        messageMap[this.group_id].get(this.keyWord).map(this.delFile.bind(this))
+      )
       messageMap[this.group_id].delete(this.keyWord)
       await this.saveJson()
       return this.reply(`删除成功：${this.keyWord}`)
@@ -299,6 +313,7 @@ export class add extends plugin {
         if (msg) {
           const n = index.slice(-i)-1
           if (msg[n]) {
+            await this.delFile(msg[n])
             msg.splice(n, 1)
             if (!msg.length)
               messageMap[this.group_id].delete(keyWord)
