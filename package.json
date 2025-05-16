@@ -35,6 +35,7 @@
     "pm2": "^6.0.5",
     "puppeteer": "*",
     "redis": "^4.7.1",
+    "rcon-client": "^5.0.0",
     "sequelize": "^6.37.7",
     "sqlite3": "5.1.6",
     "strip-ansi": "^7.1.0",
