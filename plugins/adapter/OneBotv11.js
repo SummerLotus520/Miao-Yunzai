@@ -919,6 +919,9 @@ Bot.adapter.push(new class OneBotv11Adapter {
         Bot.makeLog("info", `群禁言：${data.operator_id} => ${data.user_id} ${data.sub_type} ${data.duration}秒`, `${data.self_id} <= ${data.group_id}`, true)
         data.bot.pickMember(data.group_id, data.user_id).getInfo()
         break
+      case "group_msg_emoji_like":
+        Bot.makeLog("info", [`群消息回应：${data.message_id}`, data.likes], `${data.self_id} <= ${data.group_id}, ${data.user_id}`, true)
+        break
       case "friend_add":
         Bot.makeLog("info", "好友添加", `${data.self_id} <= ${data.user_id}`, true)
         data.bot.pickFriend(data.user_id).getInfo()
@@ -943,6 +946,13 @@ Bot.adapter.push(new class OneBotv11Adapter {
           case "title":
             Bot.makeLog("info", `群头衔：${data.title}`, `${data.self_id} <= ${data.group_id}, ${data.user_id}`, true)
             data.bot.pickMember(data.group_id, data.user_id).getInfo()
+            break
+          case "input_status":
+            data.post_type = "internal"
+            data.notice_type = "input"
+            data.end ??= data.event_type !== 1
+            data.message ||= data.status_text || `对方${data.end?"结束":"正在"}输入...`
+            Bot.makeLog("info", data.message, `${data.self_id} <= ${data.user_id}`, true)
             break
           default:
             Bot.makeLog("warn", `未知通知：${logger.magenta(data.raw)}`, data.self_id)
@@ -992,6 +1002,12 @@ Bot.adapter.push(new class OneBotv11Adapter {
         data.notice_type = "guild_channel_destroyed"
         Bot.makeLog("info", `子频道删除：${Bot.String(data.channel_info)}`, `${data.self_id} <= ${data.guild_id}-${data.channel_id}, ${data.user_id}`, true)
         data.bot.getGroupMap()
+        break
+      case "bot_offline":
+        data.post_type = "system"
+        data.notice_type = "offline"
+        Bot.makeLog("info", `${data.tag || "账号下线"}：${data.message}`, data.self_id)
+        Bot.sendMasterMsg(`[${data.self_id}] ${data.tag || "账号下线"}：${data.message}`)
         break
       default:
         Bot.makeLog("warn", `未知通知：${logger.magenta(data.raw)}`, data.self_id)
