@@ -2,7 +2,7 @@ Bot.adapter.push(new class OPQBotAdapter {
   id = "QQ"
   name = "OPQBot"
   path = this.name
-  echo = {}
+  echo = new Map
   timeout = 60000
   CommandId = {
     FriendImage: 1,
@@ -15,18 +15,22 @@ Bot.adapter.push(new class OPQBotAdapter {
     const ReqId = Math.round(Math.random()*10**16)
     const request = { BotUin: String(id), CgiCmd, CgiRequest, ReqId }
     Bot[id].ws.sendMsg(request)
-    const error = Error()
-    return new Promise((resolve, reject) =>
-      this.echo[ReqId] = {
-        request, resolve, reject, error,
-        timeout: setTimeout(() => {
-          reject(Object.assign(error, request, { timeout: this.timeout }))
-          delete this.echo[ReqId]
-          Bot.makeLog("error", ["请求超时", request], id)
-          Bot[id].ws.terminate()
-        }, this.timeout),
-      }
-    )
+    const cache = Promise.withResolvers()
+    this.echo.set(ReqId, cache)
+    const timeout = setTimeout(() => {
+      cache.reject(Bot.makeError("请求超时", request, { timeout: this.timeout }))
+      Bot.makeLog("error", ["请求超时", request], id)
+      ws.terminate()
+    }, this.timeout)
+
+    return cache.promise.then(data => {
+      if (data.CgiBaseResponse?.Ret !== 0)
+        throw Bot.makeError(data.CgiBaseResponse?.ErrMsg, request, { error: data })
+      return data
+    }).finally(() => {
+      clearTimeout(timeout)
+      this.echo.delete(ReqId)
+    })
   }
 
   makeLog(msg) {
@@ -338,21 +342,12 @@ Bot.adapter.push(new class OPQBotAdapter {
       else
         this.makeBot(id, ws)
 
-      this.makeEvent(id, data.CurrentPacket)
-    } else if (data.ReqId && this.echo[data.ReqId]) {
-      if (data.CgiBaseResponse?.Ret !== 0)
-        this.echo[data.ReqId].reject(Object.assign(
-          this.echo[data.ReqId].error,
-          this.echo[data.ReqId].request,
-          { error: data },
-        ))
-      else
-        this.echo[data.ReqId].resolve(data)
-      clearTimeout(this.echo[data.ReqId].timeout)
-      delete this.echo[data.ReqId]
-    } else {
-      Bot.makeLog("warn", `未知消息：${logger.magenta(data.raw)}`, id)
+      return this.makeEvent(id, data.CurrentPacket)
+    } else if (data.ReqId) {
+      const cache = this.echo.get(data.ReqId)
+      if (cache) return cache.resolve(data)
     }
+    Bot.makeLog("warn", `未知消息：${logger.magenta(data.raw)}`, id)
   }
 
   load() {

@@ -1,3 +1,4 @@
+import cfg from "../../lib/config/config.js"
 import path from "node:path"
 import { ulid } from "ulid"
 
@@ -5,7 +6,7 @@ Bot.adapter.push(new class OneBotv11Adapter {
   id = "QQ"
   name = "OneBotv11"
   path = this.name
-  echo = {}
+  echo = new Map
   timeout = 60000
 
   makeLog(msg) {
@@ -16,18 +17,24 @@ Bot.adapter.push(new class OneBotv11Adapter {
     const echo = ulid()
     const request = { action, params, echo }
     ws.sendMsg(request)
-    const error = Error()
-    return new Promise((resolve, reject) =>
-      this.echo[echo] = {
-        request, resolve, reject, error,
-        timeout: setTimeout(() => {
-          reject(Object.assign(error, request, { timeout: this.timeout }))
-          delete this.echo[echo]
-          Bot.makeLog("error", ["请求超时", request], data.self_id)
-          ws.terminate()
-        }, this.timeout),
-      }
-    )
+    const cache = Promise.withResolvers()
+    this.echo.set(echo, cache)
+    const timeout = setTimeout(() => {
+      cache.reject(Bot.makeError("请求超时", request, { timeout: this.timeout }))
+      Bot.makeLog("error", ["请求超时", request], data.self_id)
+      ws.terminate()
+    }, this.timeout)
+
+    return cache.promise.then(data => {
+      if (data.retcode !== 0 && data.retcode !== 1)
+        throw Bot.makeError(data.msg || data.wording, request, { error: data })
+      return data.data ? new Proxy(data, {
+        get: (target, prop) => target.data[prop] ?? target[prop],
+      }) : data
+    }).finally(() => {
+      clearTimeout(timeout)
+      this.echo.delete(echo)
+    })
   }
 
   async makeFile(file, opts) {
@@ -155,11 +162,12 @@ Bot.adapter.push(new class OneBotv11Adapter {
     return msg
   }
 
-  async getFriendMsgHistory(data, message_seq, count) {
+  async getFriendMsgHistory(data, message_seq, count, reverseOrder = true) {
     const msgs = (await data.bot.sendApi("get_friend_msg_history", {
       user_id: data.user_id,
       message_seq,
       count,
+      reverseOrder,
     })).data?.messages
 
     for (const i of Array.isArray(msgs) ? msgs : [msgs])
@@ -168,11 +176,12 @@ Bot.adapter.push(new class OneBotv11Adapter {
     return msgs
   }
 
-  async getGroupMsgHistory(data, message_seq, count) {
+  async getGroupMsgHistory(data, message_seq, count, reverseOrder = true) {
     const msgs = (await data.bot.sendApi("get_group_msg_history", {
       group_id: data.group_id,
       message_seq,
       count,
+      reverseOrder,
     })).data?.messages
 
     for (const i of Array.isArray(msgs) ? msgs : [msgs])
@@ -316,6 +325,8 @@ Bot.adapter.push(new class OneBotv11Adapter {
   }
 
   async getGroupMemberMap(data) {
+    if (!cfg.bot.cache_group_member)
+      return this.getGroupMap(data)
     for (const [group_id, group] of await this.getGroupMap(data)) {
       if (group.guild) continue
       await this.getMemberMap({ ...data, group_id })
@@ -679,7 +690,7 @@ Bot.adapter.push(new class OneBotv11Adapter {
       getAvatarUrl() { return this.avatar || `https://q.qlogo.cn/g?b=qq&s=0&nk=${user_id}` },
       poke: this.sendGroupMsg.bind(this, i, { type: "poke", qq: user_id }),
       mute: this.setGroupBan.bind(this, i, user_id),
-      kick: this.setGroupKick.bind(i, user_id),
+      kick: this.setGroupKick.bind(this, i, user_id),
       get is_friend() { return data.bot.fl.has(user_id) },
       get is_owner() { return this.role === "owner" },
       get is_admin() { return this.role === "admin" || this.is_owner },
@@ -884,7 +895,7 @@ Bot.adapter.push(new class OneBotv11Adapter {
         Bot.makeLog("info", `群成员增加：${data.operator_id} => ${data.user_id} ${data.sub_type}`, `${data.self_id} <= ${data.group_id}`, true)
         const group = data.bot.pickGroup(data.group_id)
         group.getInfo()
-        if (data.user_id === data.self_id)
+        if (data.user_id === data.self_id && cfg.bot.cache_group_member)
           group.getMemberMap()
         else
           group.pickMember(data.user_id).getInfo()
@@ -1083,40 +1094,22 @@ Bot.adapter.push(new class OneBotv11Adapter {
 
       switch (data.post_type) {
         case "meta_event":
-          this.makeMeta(data, ws)
-          break
+          return this.makeMeta(data, ws)
         case "message":
-          this.makeMessage(data)
-          break
+          return this.makeMessage(data)
         case "notice":
-          this.makeNotice(data)
-          break
+          return this.makeNotice(data)
         case "request":
-          this.makeRequest(data)
-          break
+          return this.makeRequest(data)
         case "message_sent":
           data.post_type = "message"
-          this.makeMessage(data)
-          break
-        default:
-          Bot.makeLog("warn", `未知消息：${logger.magenta(data.raw)}`, data.self_id)
+          return this.makeMessage(data)
       }
-    } else if (data.echo && this.echo[data.echo]) {
-      if (![0, 1].includes(data.retcode))
-        this.echo[data.echo].reject(Object.assign(
-          this.echo[data.echo].error,
-          this.echo[data.echo].request,
-          { error: data },
-        ))
-      else
-        this.echo[data.echo].resolve(data.data ? new Proxy(data, {
-          get: (target, prop) => target.data[prop] ?? target[prop],
-        }) : data)
-      clearTimeout(this.echo[data.echo].timeout)
-      delete this.echo[data.echo]
-    } else {
-      Bot.makeLog("warn", `未知消息：${logger.magenta(data.raw)}`, data.self_id)
+    } else if (data.echo) {
+      const cache = this.echo.get(data.echo)
+      if (cache) return cache.resolve(data)
     }
+    Bot.makeLog("warn", `未知消息：${logger.magenta(data.raw)}`, data.self_id)
   }
 
   load() {
