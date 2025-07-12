@@ -84,22 +84,18 @@ export default class Puppeteer extends Renderer {
     } catch {}
 
     if (!this.browser || !connectFlag) {
+      await fs.rm(this.config.userDataDir, { force: true, recursive: true }).catch(() => {})
       // 如果没有实例，初始化puppeteer
       this.browser = await puppeteer.launch(this.config).catch(async (err, trace) => {
         const errMsg = err.toString() + (trace ? trace.toString() : "")
         logger.error(err, trace)
-        if (errMsg.includes("Could not find Chromium")) {
+        if (errMsg.includes("Could not find Chromium"))
           logger.error(
             "没有正确安装 Chromium，可以尝试执行安装命令：node node_modules/puppeteer/install.js",
           )
-        } else if (errMsg.includes("cannot open shared object file")) {
+        else if (errMsg.includes("cannot open shared object file"))
           logger.error("没有正确安装 Chromium 运行库")
-        } else if (errMsg.includes(this.config.userDataDir)) {
-          await fs.rm(this.config.userDataDir, { force: true, recursive: true }).catch(() => {})
-          return (this.lock = false)
-        }
       })
-      if (this.lock === false) return this.browserInit()
     }
 
     this.lock = false
