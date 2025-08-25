@@ -186,37 +186,6 @@ export default class Puppeteer extends Renderer {
       const page = await this.browser.newPage()
       const pageGotoParams = lodash.extend(this.pageGotoParams, data.pageGotoParams || {})
       await page.goto(`file://${_path}${lodash.trim(savePath, ".")}`, pageGotoParams)
-      
-      const keywordReplacement = { from: new RegExp('TRSS', 'gi'), to: 'LotusFork' };
-      const copyrightHtml = `
-        <div id="unified-copyright" style="position: fixed; right: 15px; bottom: 10px; z-index: 99999; font-family: sans-serif; text-align: right; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-          <span style="font-weight: bold; color: gold;">Yunzai-Fork</span> &
-          <span style="font-weight: bold; color: gold;">Miao-Plugin-Fork</span> By
-          <span style="font-weight: bold; color: #90ee90;">Lotus</span><br>
-          <span style="font-weight: bold; font-size: larger;">
-            <span style="color: #00BFFF;">机器人主人：</span>
-            <span style="color: #90ee90;">荷花</span>
-            <span style="color: #00BFFF;"> 荷花的小群：</span>
-            <span style="color: #ff3030; font-weight: bold; font-size: x-large;">702211431</span>
-          </span><br>
-          服务器到期/机器人停运日期：<span style="color: #ff3030; font-weight: bold; font-size: x-large;">2026/01</span><br>
-          感谢您的<span style="color: #ff3030; font-weight: bold; font-size: x-large;">捐赠</span> 你的捐赠是对机器人运行最大的支持续命！
-        </div>
-      `;
-
-      await page.evaluate((replacement, copyright) => {
-        // 关键词替换
-        const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        let node;
-        while (node = walk.nextNode()) {
-            if (node.nodeValue) {
-                node.nodeValue = node.nodeValue.replace(replacement.from, replacement.to);
-            }
-        }
-        // 版权添加
-        document.body.insertAdjacentHTML('beforeend', copyright);
-      }, keywordReplacement, copyrightHtml);
-
       const body = (await page.$("#container")) || (await page.$("body"))
 
       // 计算页面高度
