@@ -143,6 +143,18 @@ export default class Puppeteer extends Renderer {
 
   /**
    * `chromium` 截图
+   * @param name
+   * @param data 模板参数
+   * @param data.tplFile 模板路径，必传
+   * @param data.saveId  生成html名称，为空name代替
+   * @param data.imgType  screenshot参数，生成图片类型：jpeg，png
+   * @param data.quality  screenshot参数，图片质量 0-100，jpeg是可传，默认90
+   * @param data.omitBackground  screenshot参数，隐藏默认的白色背景，背景透明。默认不透明
+   * @param data.path   screenshot参数，截图保存路径。截图图片类型将从文件扩展名推断出来。如果是相对路径，则从当前路径解析。如果没有指定路径，图片将不会保存到硬盘。
+   * @param data.multiPage 是否分页截图，默认false
+   * @param data.multiPageHeight 分页状态下页面高度，默认4000
+   * @param data.pageGotoParams 页面goto时的参数
+   * @return img 不做segment包裹
    */
   async screenshot(name, data = {}) {
     if (!(await this.browserInit())) return false
@@ -160,6 +172,7 @@ export default class Puppeteer extends Renderer {
     const puppeteerTimeout = this.puppeteerTimeout
     let overtime
     if (puppeteerTimeout > 0) {
+      // TODO 截图超时处理
       overtime = setTimeout(() => {
         if (this.shoting.length) {
           logger.error(`[图片生成][${name}] 截图超时，当前等待队列：${this.shoting.join(",")}`)
@@ -173,61 +186,11 @@ export default class Puppeteer extends Renderer {
       const page = await this.browser.newPage()
       const pageGotoParams = lodash.extend(this.pageGotoParams, data.pageGotoParams || {})
       await page.goto(`file://${_path}${lodash.trim(savePath, ".")}`, pageGotoParams)
-      
-      const keywordReplacement = { from: new RegExp('TRSS', 'gi'), to: 'LotusFork' };
-      const copyrightHtml = `
-          <span style="font-weight: bold; color: gold;">Yunzai-Fork</span> &
-          <span style="font-weight: bold; color: gold;">Miao-Plugin-Fork</span> By
-          <span style="font-weight: bold; color: #90ee90;">Lotus</span><br>
-          <span style="font-weight: bold; font-size: larger;">
-            <span style="color: #00BFFF;">机器人主人：</span>
-            <span style="color: #90ee90;">荷花</span>
-            <span style="color: #00BFFF;"> 荷花的小群：</span>
-            <span style="color: #ff3030; font-weight: bold; font-size: x-large;">702211431</span>
-          </span><br>
-          服务器到期/机器人停运日期：<span style="color: #ff3030; font-weight: bold; font-size: x-large;">2026/01</span><br>
-          感谢您的<span style="color: #ff3030; font-weight: bold; font-size: x-large;">捐赠</span> 你的捐赠是对机器人运行最大的支持续命！
-      `;
-
-      await page.evaluate((replacement, copyright) => {
-        // 关键词替换
-        const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        let node;
-        while (node = walk.nextNode()) {
-            if (node.nodeValue) {
-                node.nodeValue = node.nodeValue.replace(replacement.from, replacement.to);
-            }
-        }
-
-        // 版权添加 (动态内边距模式)
-        document.body.style.position = 'relative';
-
-        const overlayDiv = document.createElement('div');
-        overlayDiv.id = 'unified-copyright-overlay';
-        overlayDiv.style.position = 'absolute';
-        overlayDiv.style.bottom = '0';
-        overlayDiv.style.left = '0';
-        overlayDiv.style.right = '0';
-        overlayDiv.style.padding = '10px';
-        overlayDiv.style.boxSizing = 'border-box';
-        overlayDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-        overlayDiv.style.color = '#000000';
-        overlayDiv.style.textAlign = 'center';
-        overlayDiv.style.lineHeight = '1.5';
-        overlayDiv.style.fontFamily = '"MiSans VF Regular", sans-serif';
-        overlayDiv.style.zIndex = '9999';
-        overlayDiv.innerHTML = copyright;
-        document.body.appendChild(overlayDiv);
-
-        // 测量版权信息的高度，并将其作为内边距添加到body底部
-        const overlayHeight = overlayDiv.offsetHeight;
-        document.body.style.paddingBottom = `${overlayHeight}px`;
-
-      }, keywordReplacement, copyrightHtml);
-
       const body = (await page.$("#container")) || (await page.$("body"))
 
+      // 计算页面高度
       const boundingBox = await body.boundingBox()
+      // 分页数
       let num = 1
 
       const randData = {
@@ -247,13 +210,16 @@ export default class Puppeteer extends Renderer {
       if (!data.multiPage) {
         buff = await body.screenshot(randData)
         if (!Buffer.isBuffer(buff)) buff = Buffer.from(buff)
+
         this.renderNum++
+        /** 计算图片大小 */
         const kb = (buff.length / 1024).toFixed(2) + "KB"
         logger.mark(
           `[图片生成][${name}][${this.renderNum}次] ${kb} ${logger.green(`${Date.now() - start}ms`)}`,
         )
         ret.push(buff)
       } else {
+        // 分片截图
         if (num > 1) {
           await page.setViewport({
             width: boundingBox.width,
@@ -266,13 +232,19 @@ export default class Puppeteer extends Renderer {
               width: boundingBox.width,
               height: parseInt(boundingBox.height) - pageHeight * (num - 1),
             })
+
           if (i !== 1 && i <= num)
             await page.evaluate(pageHeight => window.scrollBy(0, pageHeight), pageHeight)
+
           if (num === 1) buff = await body.screenshot(randData)
           else buff = await page.screenshot(randData)
           if (!Buffer.isBuffer(buff)) buff = Buffer.from(buff)
+
           if (num > 2) await timers.setTimeout(200)
+
           this.renderNum++
+
+          /** 计算图片大小 */
           const kb = (buff.length / 1024).toFixed(2) + "KB"
           logger.mark(`[图片生成][${name}][${i}/${num}] ${kb}`)
           ret.push(buff)
@@ -284,6 +256,7 @@ export default class Puppeteer extends Renderer {
       page.close().catch(err => logger.error(err))
     } catch (err) {
       logger.error(`[图片生成][${name}] 图片生成失败`, err)
+      /** 关闭浏览器 */
       this.restart(true)
       if (overtime) clearTimeout(overtime)
       ret = []
@@ -303,7 +276,9 @@ export default class Puppeteer extends Renderer {
     return data.multiPage ? ret : ret[0]
   }
 
+  /** 重启 */
   restart(force = false) {
+    /** 截图超过重启数时，自动关闭重启浏览器，避免生成速度越来越慢 */
     if (!this.browser?.close || this.lock) return
     if (!force) if (this.renderNum % this.restartNum !== 0 || this.shoting.length > 0) return
     logger.info(`puppeteer Chromium ${force ? "强制" : ""}关闭重启...`)
