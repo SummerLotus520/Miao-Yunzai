@@ -23,6 +23,23 @@ dump.rdb
 
 # Config files
 config/*.yaml
+/config/*
+!/config/default_config
+
+# Plugins
+/plugins/*
+!/plugins/adapter
+!/plugins/system
+!/plugins/other
+
+# Renderers
+/renderers/*/config.yaml
+
+# Resources
+/resources
+
+# Shell scripts
+/*.sh
 
 # VSCode & Visual Studio
 .vscode/
