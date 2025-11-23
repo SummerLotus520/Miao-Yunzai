@@ -21,10 +21,10 @@
     "art-template": "4.13.2",
     "chalk": "^5.6.0",
     "chokidar": "^4.0.3",
-    "es-toolkit": "^1.41.0",
+    "es-toolkit": "^1.42.0",
     "express": "^4.21.2",
-    "file-type": "^21.0.0",
-    "https-proxy-agent": "7.0.6",
+    "file-type": "^21.1.1",
+    "https-proxy-agent": "^7.0.6",
     "image-size": "^2.0.2",
     "level": "^10.0.0",
     "lodash": "^4.17.21",
@@ -34,13 +34,13 @@
     "node-fetch": "file:lib/modules/node-fetch",
     "node-schedule": "^2.1.1",
     "oicq": "link:lib/modules/oicq",
-    "pm2": "^6.0.8",
-    "puppeteer": "*",
+    "pm2": "^6.0.13",
+    "puppeteer": "^24.30.0",
     "rcon-client": "*",
     "redis": "^4.7.1",
     "sequelize": "^6.37.7",
-    "sqlite3": "5.1.6",
-    "strip-ansi": "^7.1.0",
+    "sqlite3": "^5.1.7",
+    "strip-ansi": "^7.1.2",
     "ulid": "^3.0.1",
     "ws": "^8.18.3",
     "yaml": "^2.8.1"
@@ -52,7 +52,24 @@
     "#miao": "./plugins/miao-plugin/components/index.js",
     "#miao.models": "./plugins/miao-plugin/models/index.js"
   },
+  "resolutions": {
+    "log4js": "patch:log4js@npm:^6.9.1#./lib/modules/log4js.patch",
+    "streamroller": "patch:streamroller@npm:^3.1.5#./lib/modules/streamroller.patch"
+  },
   "devDependencies": {
     "prettier": "^3.6.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sqlite3",
+      "classic-level",
+      "log4js",
+      "puppeteer",
+      "sharp"
+    ],
+    "patchedDependencies": {
+      "log4js": "lib/modules/log4js.patch",
+      "streamroller": "lib/modules/streamroller.patch"
+    }
   }
 }
