@@ -1,3 +1,4 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 switch (process.env.app_type || process.argv[2]) {
   case "stop": {
     const cfg = (await import("./lib/config/config.js")).default
