@@ -51,11 +51,11 @@ git clone --depth 1 https://gitee.com/TimeRainStarSky/Yunzai
 cd Yunzai
 ```
 
-2. 安装 [pnpm](https://pnpm.io/zh/installation) 和依赖
+2. 启用 Yarn 4 并安装依赖
 
 ```sh
-npm i -g pnpm
-pnpm i
+corepack enable
+yarn install
 ```
 
 3. 前台运行
@@ -70,16 +70,16 @@ pnpm i
 
 | 操作 | 命令 |
 | ---- | ---- |
-| 启动 | pnpm start |
-| 停止 | pnpm stop |
-| 日志 | pnpm log |
+| 启动 | yarn start |
+| 停止 | yarn stop |
+| 日志 | yarn log |
 
 5. 开机自启
 
 ```sh
-pnpm start
-pnpm pm2 save
-pnpm pm2 startup
+yarn start
+yarn pm2 save
+yarn pm2 startup
 ```
 
 </details>

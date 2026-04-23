@@ -5,6 +5,7 @@
   "description": "Bot",
   "main": "app.js",
   "type": "module",
+  "packageManager": "yarn@4.9.2",
   "private": true,
   "scripts": {
     "app": "node .",
@@ -54,18 +55,5 @@
   },
   "devDependencies": {
     "prettier": "^3.8.2"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sqlite3",
-      "classic-level",
-      "log4js",
-      "puppeteer",
-      "sharp"
-    ],
-    "patchedDependencies": {
-      "log4js": "lib/modules/log4js.patch",
-      "streamroller": "lib/modules/streamroller.patch"
-    }
   }
 }

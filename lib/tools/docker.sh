@@ -82,9 +82,10 @@ RUN sed -i "s|deb.debian.org|'"$APTURL"'|g" /etc/apt/sources.list.d/debian.sourc
  && apt clean\
  && ln -vsf valkey-server /bin/redis-server\
  && git config --global --add safe.directory "*"\
- && npm install -g pnpm --registry "'"$NPMURL"'"\
+ && corepack enable\
+ && corepack prepare yarn@4.9.2 --activate\
  && rm -rf /var/cache/* /var/log/* /var/lib/apt /root/.npm\
- && echo -n "[ -s .git ]||git clone --depth 1 --single-branch \"'"$GITURL"'\" .&&pnpm install --force&&echo -n \"exec node . start\">/start&&exec sh /start">/start
+ && echo -n "[ -s .git ]||git clone --depth 1 --single-branch \"'"$GITURL"'\" .&&yarn install&&echo -n \"exec node . start\">/start&&exec sh /start">/start
 HEALTHCHECK CMD curl -s http://localhost:2536/status||exit 1
 WORKDIR /root/Yunzai
 ENTRYPOINT []

@@ -1,6 +1,5 @@
 # Node dependencies
 node_modules/
-.pnpm-store/
 .pnp.*
 .pnpjs/
 
@@ -11,9 +10,6 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-# Lockfiles
-pnpm-lock.yaml
 
 # Application-specific
 data/
