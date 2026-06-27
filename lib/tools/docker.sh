@@ -14,7 +14,7 @@ CMD="${CMD:-tsyz}"
 CMDPATH="${CMDPATH:-/usr/local/bin}"
 DKNAME="${DKNAME:-Yunzai}"
 DKURL="${DKURL:-docker.m.daocloud.io}"
-GITURL="${GITURL:-https://gitee.com/TimeRainStarSky/Yunzai}"
+GITURL="${GITURL:-https://git.trss.me/Yunzai}"
 APTURL="${APTURL:-mirrors.ustc.edu.cn}"
 APTDEP="${APTDEP:-chromium fonts-lxgw-wenkai fonts-noto-color-emoji}"
 NPMURL="${NPMURL:-https://registry.npmmirror.com}"
@@ -70,7 +70,7 @@ $Y- 正在构建 Docker 容器$O
 "
 mktmp
 cd "$TMP"
-echo "FROM $DKURL"'/library/node:trixie-slim
+echo "FROM $DKURL"'/library/node:slim
 RUN sed -i "s|deb.debian.org|'"$APTURL"'|g" /etc/apt/sources.list.d/debian.sources\
  && apt update\
  && apt install -y ca-certificates\

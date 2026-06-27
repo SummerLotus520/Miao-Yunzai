@@ -22,8 +22,9 @@
     "art-template": "4.13.2",
     "chalk": "^5.6.2",
     "chokidar": "^5.0.0",
-    "es-toolkit": "^1.45.1",
-    "express": "^4.22.1",
+    "compression": "^1.8.1",
+    "es-toolkit": "^1.47.1",
+    "express": "^5.2.1",
     "file-type": "^22.0.1",
     "https-proxy-agent": "^7.0.6",
     "image-size": "^2.0.2",
@@ -35,16 +36,16 @@
     "node-fetch": "file:lib/modules/node-fetch",
     "node-schedule": "^2.1.1",
     "oicq": "link:lib/modules/oicq",
-    "pm2": "^6.0.14",
-    "puppeteer": "^24.30.0",
+    "pm2": "^7.0.1",
+    "puppeteer": "*",
     "rcon-client": "*",
     "redis": "^4.7.1",
     "sequelize": "^6.37.8",
-    "sqlite3": "^6.0.1",
+    "sqlite3": "npm:@karinjs/sqlite3@^0.4.3",
     "strip-ansi": "^7.2.0",
     "ulid": "^3.0.2",
-    "ws": "^8.20.0",
-    "yaml": "^2.8.3"
+    "ws": "^8.21.0",
+    "yaml": "^2.9.0"
   },
   "workspaces": [
     "plugins/*"
@@ -54,6 +55,6 @@
     "#miao.models": "./plugins/miao-plugin/models/index.js"
   },
   "devDependencies": {
-    "prettier": "^3.8.2"
+    "prettier": "^3.8.4"
   }
 }

@@ -4,12 +4,9 @@
 
 Yunzai 应用端，支持多账号，支持协议端：OneBotv11、ComWeChat、GSUIDCore、ICQQ、QQBot、QQ频道、微信、KOOK、Telegram、Discord、OPQBot、Lagrange
 
-[![访问量](https://visitor-badge.glitch.me/badge?page_id=TimeRainStarSky.Yunzai&right_color=red&left_text=访%20问%20量)](https://github.com/TimeRainStarSky/Yunzai)
 [![Stars](https://img.shields.io/github/stars/TimeRainStarSky/Yunzai?color=yellow&label=收藏)](../../stargazers)
 [![Downloads](https://img.shields.io/github/downloads/TimeRainStarSky/Yunzai/total?color=blue&label=下载)](../../archive/main.tar.gz)
 [![Releases](https://img.shields.io/github/v/release/TimeRainStarSky/Yunzai?color=green&label=发行版)](../../releases/latest)
-
-[![访问量](https://profile-counter.glitch.me/TimeRainStarSky-Yunzai/count.svg)](https://github.com/TimeRainStarSky/Yunzai)
 
 </div>
 
@@ -43,17 +40,24 @@ Yunzai 应用端，支持多账号，支持协议端：OneBotv11、ComWeChat、G
 
 1. Git Clone 项目
 
-请根据网络情况选择使用 GitHub 或 Gitee 安装
+```sh
+git clone --depth 1 https://git.trss.me/Yunzai
+```
+
+<details><summary>若无法访问，请根据网络情况选择镜像源</summary>
 
 ```sh
 git clone --depth 1 https://github.com/TimeRainStarSky/Yunzai
 git clone --depth 1 https://gitee.com/TimeRainStarSky/Yunzai
-cd Yunzai
+git clone --depth 1 https://gitcode.com/TimeRainStarSky/Yunzai
 ```
+
+</details>
 
 2. 启用 Yarn 4 并安装依赖
 
 ```sh
+cd Yunzai
 corepack enable
 yarn install
 ```
@@ -87,9 +91,18 @@ yarn pm2 startup
 <details><summary>Docker 安装</summary>
 
 ```sh
+bash <(curl -L https://git.trss.me/Yunzai/raw/main/lib/tools/docker.sh)
+```
+
+<details><summary>镜像源</summary>
+
+```sh
 bash <(curl -L https://github.com/TimeRainStarSky/Yunzai/raw/main/lib/tools/docker.sh)
 bash <(curl -L https://gitee.com/TimeRainStarSky/Yunzai/raw/main/lib/tools/docker.sh)
+bash <(curl -L https://raw.gitcode.com/TimeRainStarSky/Yunzai/raw/main/lib/tools/docker.sh)
 ```
+
+</details>
 
 | 参数 | 描述 | 默认值 |
 | ---- | ---- | ------ |
@@ -98,7 +111,7 @@ bash <(curl -L https://gitee.com/TimeRainStarSky/Yunzai/raw/main/lib/tools/docke
 | CMDPATH | 命令文件夹 | /usr/local/bin |
 | DKNAME | 容器名 | Yunzai |
 | DKURL | Docker 源 | docker.m.daocloud.io |
-| GITURL | GIT 源 | https://gitee.com/TimeRainStarSky/Yunzai |
+| GITURL | GIT 源 | https://git.trss.me/Yunzai |
 | APTURL | APT 源 | mirrors.ustc.edu.cn |
 | APTDEP | APT 依赖 | chromium fonts-lxgw-wenkai fonts-noto-color-emoji |
 | NPMURL | NPM 源 | https://registry.npmmirror.com |
