@@ -56,6 +56,7 @@ Bot.adapter.push(
       if (!Array.isArray(msg)) msg = [msg]
       const msgs = []
       const forward = []
+      const files = []
       for (let i of msg) {
         if (typeof i !== "object") i = { type: "text", data: { text: i } }
         else if (!i.data) i = { type: i.type, data: { ...i, type: undefined } }
@@ -72,26 +73,35 @@ Bot.adapter.push(
           case "node":
             forward.push(...i.data)
             continue
+          case "file":
+            files.push({ file: i.data.file, name: i.data.name })
+            continue
           case "raw":
             i = i.data
             break
         }
 
-        if (i.data.file) i.data.file = await this.makeFile(i.data.file)
+        if (i.data?.file) i.data.file = await this.makeFile(i.data.file)
 
         msgs.push(i)
       }
-      return [msgs, forward]
+      return [msgs, forward, files]
     }
 
-    async sendMsg(msg, send, sendForwardMsg) {
-      const [message, forward] = await this.makeMsg(msg)
+    async sendMsg(msg, send, sendForwardMsg, sendFile) {
+      const [message, forward, files] = await this.makeMsg(msg)
       const ret = []
 
       if (forward.length) {
         const data = await sendForwardMsg(forward)
         if (Array.isArray(data)) ret.push(...data)
         else ret.push(data)
+      }
+
+      for (const { file, name } of files) {
+        if (sendFile) {
+          ret.push(await sendFile(file, name || path.basename(file)))
+        }
       }
 
       if (message.length) ret.push(await send(message))
@@ -118,6 +128,7 @@ Bot.adapter.push(
           })
         },
         msg => this.sendFriendForwardMsg(data, msg),
+        (file, name) => this.sendFriendFile(data, file, name),
       )
     }
 
@@ -137,6 +148,7 @@ Bot.adapter.push(
           })
         },
         msg => this.sendGroupForwardMsg(data, msg),
+        (file, name) => this.sendGroupFile(data, file, undefined, name),
       )
     }
 
@@ -594,6 +606,28 @@ Bot.adapter.push(
       })
     }
 
+    async sendGroupNotice(data, content, opts = {}) {
+      Bot.makeLog(
+        "info",
+        [`发送群公告：${content}`, opts],
+        `${data.self_id} => ${data.group_id}`,
+        true,
+      )
+      if (opts.image) opts.image = await this.makeFile(opts.image)
+      return data.bot.sendApi("_send_group_notice", {
+        group_id: data.group_id,
+        content,
+        ...opts,
+      })
+    }
+
+    getGroupNotice(data) {
+      Bot.makeLog("info", "获取群公告", `${data.self_id} => ${data.group_id}`, true)
+      return data.bot.sendApi("_get_group_notice", {
+        group_id: data.group_id,
+      })
+    }
+
     downloadFile(data, url, thread_count, headers) {
       return data.bot.sendApi("download_file", {
         url,
@@ -869,6 +903,11 @@ Bot.adapter.push(
         muteAll: this.setGroupWholeKick.bind(this, i),
         kickMember: this.setGroupKick.bind(this, i),
         quit: this.setGroupLeave.bind(this, i),
+        get announce() {
+          return this.sendNotice
+        },
+        sendNotice: this.sendGroupNotice.bind(this, i),
+        getNotice: this.getGroupNotice.bind(this, i),
         fs: this.getGroupFs(i),
         get is_owner() {
           return data.bot.gml.get(group_id)?.get(data.self_id)?.role === "owner"
